@@ -1,0 +1,10 @@
+.next/
+.idea/
+.vscode/
+node_modules/
+generated/*.ts
+
+.env*
+README.md
+.gitignore
+next-env.d.ts
