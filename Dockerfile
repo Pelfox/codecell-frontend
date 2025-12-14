@@ -38,7 +38,7 @@ COPY package.json pnpm-lock.yaml ./
 
 # Install application dependencies
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --offline --frozen-lockfile
+    pnpm install --frozen-lockfile
 
 COPY protocol ./protocol
 
