@@ -15,21 +15,39 @@ export enum MessageLevel {
    */
   EXIT_CODE = 2,
   /**
-   * Informational message from a orchestrator (runner) process.
+   * Informational message from an orchestrator (runner) process.
    */
   INFO = 3,
   /**
-   * Error message from a orchestrator (runner) process.
+   * Error message from an orchestrator (runner) process.
    */
   ERROR = 4,
+  /**
+   * Message containing system resource usage statistics.
+   */
+  STATISTICS = 5,
   /**
    * Message type could not be determined or is unsupported.
    */
   UNRECOGNIZED = -1,
 }
 
+/**
+ * Represents system resource usage statistics at a point in time.
+ */
 export interface StatisticsMessage {
+  /**
+   * Current CPU utilization as a percentage.
+   *
+   * Range: 0-100
+   * Unit: percent (%)
+   */
   cpuPercent: number;
+  /**
+   * Amount of memory currently in use.
+   *
+   * Unit: bytes (B)
+   */
   memoryUsed: number;
 }
 
@@ -49,7 +67,15 @@ export interface Message {
    * Human-readable message content.
    */
   message?: string;
+  /**
+   * Process exit code associated with the execution. Set only with the `level`
+   * value of `MessageLevel.EXIT_CODE`.
+   */
   exitCode?: number;
+  /**
+   * Optional system resource usage statistics captured at the time
+   * this message was generated. Set only with the `level` value of `MessageLevel.STATISTICS`.
+   */
   statistics?: StatisticsMessage;
   /**
    * Timestamp indicating when the message was received.

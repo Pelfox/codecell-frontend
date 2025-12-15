@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { grpcClient } from '@/lib/realtime/grpc-client';
 import { executeSchema } from '@/lib/types/execute-schema';
 
+// TODO: keep track of users that have started the execution, and disallow the second call to the API
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const validationResult = await executeSchema.safeParseAsync(body);
