@@ -28,6 +28,11 @@ export enum MessageLevel {
   UNRECOGNIZED = -1,
 }
 
+export interface StatisticsMessage {
+  cpuPercent: number;
+  memoryUsed: number;
+}
+
 /**
  * Represents a single message for an execution request.
  */
@@ -43,7 +48,9 @@ export interface Message {
   /**
    * Human-readable message content.
    */
-  message: string;
+  message?: string;
+  exitCode?: number;
+  statistics?: StatisticsMessage;
   /**
    * Timestamp indicating when the message was received.
    */

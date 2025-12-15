@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { createSSEClient } from '@/lib/realtime/sse-client';
 import { CodeEditor } from '../code-editor';
 import { Slider } from '../ui/slider';
+import { StatisticsDialog } from './statistics-dialog';
 
 export function CodePlayground() {
   const [code, setCode] = useState('');
@@ -22,6 +23,7 @@ export function CodePlayground() {
 
   const [isRunning, setIsRunning] = useState(false);
   const [outputLogs, setOutputLogs] = useState<Message[]>([]);
+  const [statisticsMessages, setStatisticsMessages] = useState<Message[]>([]);
 
   async function handleStartClick() {
     // TODO: if `isRunning` is true, on second click cancel the operation
@@ -62,7 +64,13 @@ export function CodePlayground() {
           ...(data as Omit<Message, 'receivedAt'>),
           receivedAt: new Date(),
         };
-        setOutputLogs((prev) => [...prev, message]);
+
+        if (!message.statistics) {
+          setOutputLogs((prev) => [...prev, message]);
+        } else if (message.statistics) {
+          setStatisticsMessages((prev) => [...prev, message]);
+        }
+
         return;
       }
 
@@ -99,15 +107,18 @@ export function CodePlayground() {
       {/* Header */}
       <div className="w-full border-b border-border px-4 h-14 flex items-center justify-between">
         <span className="font-semibold tracking-tight">CodeCell</span>
-        <Button
-          variant="default"
-          size="icon-sm"
-          type="button"
-          disabled={isRunning}
-          onClick={handleStartClick}
-        >
-          {isRunning ? <Spinner /> : <PlayIcon />}
-        </Button>
+        <div className="flex items-center justify-end gap-2">
+          <StatisticsDialog messages={statisticsMessages} />
+          <Button
+            variant="default"
+            size="icon-sm"
+            type="button"
+            disabled={isRunning}
+            onClick={handleStartClick}
+          >
+            {isRunning ? <Spinner /> : <PlayIcon />}
+          </Button>
+        </div>
       </div>
 
       {/* Content */}

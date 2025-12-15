@@ -1,3 +1,4 @@
+import type { StatisticsMessage } from '@/generated/runner';
 import type { MessageLevel } from '@/lib/types/server-message';
 
 /**
@@ -26,16 +27,19 @@ function levelToClassNames(level: MessageLevel) {
 interface LogMessageProps {
   receivedAt: Date;
   level: MessageLevel;
-  message: string;
+  message?: string;
+  exitCode?: number;
 }
 
-export function LogMessage({ receivedAt, level, message }: LogMessageProps) {
+export function LogMessage({ receivedAt, level, message, exitCode }: LogMessageProps) {
   return (
     <div className="flex items-center justify-start gap-1.5 text-sm bg-background hover:bg-accent transition-colors w-full px-3 py-1">
       <span className="select-none text-neutral-400 text-xs tabular-nums">
         {receivedAt.toLocaleTimeString('ru')}
       </span>
-      <span className={levelToClassNames(level)}>{message}</span>
+      <span className={levelToClassNames(level)}>
+        {exitCode !== undefined ? `Программа завершила работу с кодом ${exitCode}.` : message}
+      </span>
     </div>
   );
 }
