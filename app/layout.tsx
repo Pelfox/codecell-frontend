@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
+import { ThemeProvider } from 'next-themes';
 import { Geist_Mono, Inter } from 'next/font/google';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 const sans = Inter({
@@ -15,10 +16,17 @@ const mono = Geist_Mono({
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
       <body className={`${sans.variable} ${mono.variable} antialiased`}>
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem={true}
+          disableTransitionOnChange={false}
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

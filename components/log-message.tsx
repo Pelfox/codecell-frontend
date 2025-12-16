@@ -1,4 +1,3 @@
-import type { StatisticsMessage } from '@/generated/runner';
 import type { MessageLevel } from '@/lib/types/server-message';
 
 /**
@@ -10,17 +9,17 @@ import type { MessageLevel } from '@/lib/types/server-message';
 function levelToClassNames(level: MessageLevel) {
   switch (level) {
     case 0:
-      return 'text-black font-mono';
+      return 'text-foreground font-mono';
     case 1:
-      return 'text-red-500 font-mono';
+      return 'text-destructive font-mono';
     case 2:
-      return 'text-neutral-500';
+      return 'text-muted-foreground';
     case 3:
-      return 'text-neutral-700';
+      return 'text-muted-foreground';
     case 4:
-      return 'text-red-500';
+      return 'text-neutral-500';
     default:
-      return 'text-neutral-700';
+      return 'text-muted-foreground';
   }
 }
 

@@ -2,9 +2,15 @@
 
 import type { BasicSetupOptions } from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { defaultSettingsGithubLight, githubLightStyle } from '@uiw/codemirror-theme-github';
+import {
+  defaultSettingsGithubDark,
+  defaultSettingsGithubLight,
+  githubDarkStyle,
+  githubLightStyle,
+} from '@uiw/codemirror-theme-github';
 import createTheme from '@uiw/codemirror-themes';
 import ReactCodeMirror from '@uiw/react-codemirror';
+import { useTheme } from 'next-themes';
 import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -26,7 +32,7 @@ const editorSettings: BasicSetupOptions = {
   highlightActiveLine: true,
 } as const;
 
-const editorTheme = createTheme({
+const editorLightTheme = createTheme({
   theme: 'light',
   settings: {
     ...defaultSettingsGithubLight,
@@ -36,6 +42,18 @@ const editorTheme = createTheme({
     gutterBackground: 'var(--accent)',
   },
   styles: [...githubLightStyle],
+});
+
+const editorDarkTheme = createTheme({
+  theme: 'dark',
+  settings: {
+    ...defaultSettingsGithubDark,
+    foreground: 'var(--foreground)',
+    fontFamily: 'var(--font-mono)',
+    background: 'var(--background)',
+    gutterBackground: 'var(--accent)',
+  },
+  styles: [...githubDarkStyle],
 });
 
 interface CodeEditorProps {
@@ -52,6 +70,8 @@ export function CodeEditor({
   language,
 }: CodeEditorProps) {
   const editorExtensions = languagesExtensions[language];
+  const { theme = 'system' } = useTheme();
+  const editorTheme = theme === 'dark' ? editorDarkTheme : editorLightTheme;
 
   const onCodeChange = useCallback(
     (value: string) => {

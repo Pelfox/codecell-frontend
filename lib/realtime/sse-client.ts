@@ -1,4 +1,17 @@
 /**
+ * Human-readable messages for each of expected error code from the server.
+ */
+const statusMessages: Record<number, string> = {
+  400: 'Ваш запрос не является корректным. Повторите попытку с иным запросом.',
+  401: 'Для выполнения данного действия требуется войти в аккаунт.',
+  422: 'Запрос на выполнение содержит некорректные данные.',
+  429: 'Вы выполняете слишком много запросов. Повторите попытку чуть позже.',
+  500: 'Произошла внутренняя ошибка сервера. Пожалуйста, зарепорьте эту ошибку.',
+  502: 'Не удаётся исполнить Ваш запрос. Если ошибка повторяется, пожалуйста, зарепорьте её.',
+  504: 'Наш сервер не отвечает. Пожалуйста, повторите попытку позже.',
+};
+
+/**
  * Callback hooks for the SSE client lifecycle.
  */
 interface Callbacks {
@@ -51,7 +64,10 @@ export async function createSSEClient(callbacks: Callbacks, endpoint: string, in
     });
 
     if (!response.ok || !response.body) {
-      callbacks.onError?.(new Error(`Got an invalid response: ${response.statusText}`));
+      const message =
+        statusMessages[response.status] ??
+        `Получен неожиданный ответ: ${response.statusText} (${response.status}).`;
+      callbacks.onError?.(new Error(message));
       return;
     }
 
