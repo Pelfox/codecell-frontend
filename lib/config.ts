@@ -17,11 +17,11 @@ const configSchema = z.object({
   /**
    * Absolute path to the private key used for signing JWTs.
    */
-  JWT_PRIVATE_PATH: z.string(),
+  JWT_PRIVATE_PATH: z.string().default('private.pem'),
   /**
    * Absolute path to the public key used for verifying JWTs.
    */
-  JWT_PUBLIC_PATH: z.string(),
+  JWT_PUBLIC_PATH: z.string().default('public.pem'),
   /**
    * Redis connection string.
    * Format: `redis://[:password@]host:port[/db]`
