@@ -1,14 +1,27 @@
 import type { NextRequest } from 'next/server';
 import type { RunResponseMessage } from '@/generated/runner';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import z from 'zod';
 import { logger } from '@/lib/logger';
 import { grpcClient } from '@/lib/realtime/grpc-client';
+import { redisClient } from '@/lib/redis';
+import { validateExecutionToken } from '@/lib/security/jwt';
+import { consumeRequest, executorRateLimiter } from '@/lib/security/ratelimiter';
 import { executeSchema } from '@/lib/types/execute-schema';
 
-// TODO: keep track of users that have started the execution, and disallow the second call to the API
-
 export async function POST(req: NextRequest) {
+  const cookieStore = await cookies();
+  const tokenCookie = cookieStore.get('execution_token');
+  if (!tokenCookie) {
+    return NextResponse.json({ message: 'Authorzation is requried.' }, { status: 401 });
+  }
+
+  const result = await validateExecutionToken(tokenCookie.value);
+  if (!result) {
+    return NextResponse.json({ message: 'Authorzation is requried.' }, { status: 401 });
+  }
+
   const body = await req.json();
   const validationResult = await executeSchema.safeParseAsync(body);
 
@@ -19,6 +32,20 @@ export async function POST(req: NextRequest) {
         details: z.treeifyError(validationResult.error),
       },
       { status: 422 },
+    );
+  }
+
+  const consumeResult = await consumeRequest(req, executorRateLimiter);
+  if (consumeResult instanceof NextResponse) {
+    return consumeResult;
+  }
+
+  const executionKey = `execution:${result.id}`;
+  const setResult = await redisClient.set(executionKey, '1', 'EX', 360, 'NX');
+  if (setResult !== 'OK') {
+    return NextResponse.json(
+      { message: 'An execution is already running for this user.' },
+      { status: 409 },
     );
   }
 
@@ -47,6 +74,13 @@ export async function POST(req: NextRequest) {
           controller.close();
           logger.info('Closed SSE connection', { reason });
         } catch {}
+
+        redisClient.del(executionKey).catch((error) => {
+          logger.error('Failed to delete execution key from Redis', {
+            message: error.message,
+            name: error.name,
+          });
+        });
 
         isClosed = true;
       }

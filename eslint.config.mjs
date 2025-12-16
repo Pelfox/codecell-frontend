@@ -6,4 +6,7 @@ export default antfu({
   nextjs: true,
   stylistic: false,
   ignores: ['./generated/', './components/ui/'],
+  rules: {
+    'no-console': 'off',
+  },
 });

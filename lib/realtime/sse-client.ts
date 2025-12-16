@@ -4,6 +4,7 @@
 const statusMessages: Record<number, string> = {
   400: 'Ваш запрос не является корректным. Повторите попытку с иным запросом.',
   401: 'Для выполнения данного действия требуется войти в аккаунт.',
+  409: 'В данный момент уже выполняется другой запрос. Пожалуйста, дождитесь его завершения.',
   422: 'Запрос на выполнение содержит некорректные данные.',
   429: 'Вы выполняете слишком много запросов. Повторите попытку чуть позже.',
   500: 'Произошла внутренняя ошибка сервера. Пожалуйста, зарепорьте эту ошибку.',
@@ -53,7 +54,7 @@ export async function createSSEClient(callbacks: Callbacks, endpoint: string, in
   let buffer = '';
   const controller = new AbortController(); // TODO: maybe expose a `stop` method?
 
-  try {
+  async function connect() {
     const response = await fetch(endpoint, {
       ...init,
       signal: controller.signal,
@@ -62,6 +63,27 @@ export async function createSSEClient(callbacks: Callbacks, endpoint: string, in
         ...init?.headers,
       },
     });
+    console.log('Got initial response from the SSE endpoint with status', response.status);
+
+    if (response.status === 401) {
+      console.log('Attempting to refresh/issue execution token for SSE connection');
+      const tokenResponse = await fetch('/api/token', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      console.log('Got response from token endpoint with status', tokenResponse.status);
+      if (!tokenResponse.ok) {
+        const message =
+          statusMessages[response.status] ??
+          `Получен неожиданный ответ: ${response.statusText} (${response.status}).`;
+        callbacks.onError?.(new Error(message));
+        return;
+      }
+      return connect();
+    }
 
     if (!response.ok || !response.body) {
       const message =
@@ -118,9 +140,15 @@ export async function createSSEClient(callbacks: Callbacks, endpoint: string, in
     }
 
     callbacks.onConnectionClose?.();
+  }
+
+  try {
+    await connect();
   } catch (error) {
     if ((error as any).name !== 'AbortError') {
       callbacks.onError?.(error as Error);
     }
   }
+
+  return () => controller.abort();
 }

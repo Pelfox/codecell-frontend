@@ -14,6 +14,19 @@ const configSchema = z.object({
    * Active environment for the Node.js process.
    */
   NODE_ENV: z.enum(['development', 'test', 'production']),
+  /**
+   * Absolute path to the private key used for signing JWTs.
+   */
+  JWT_PRIVATE_PATH: z.string(),
+  /**
+   * Absolute path to the public key used for verifying JWTs.
+   */
+  JWT_PUBLIC_PATH: z.string(),
+  /**
+   * Redis connection string.
+   * Format: `redis://[:password@]host:port[/db]`
+   */
+  REDIS_DSN: z.string().default('redis://localhost:6379'),
 });
 
 const parsedConfig = configSchema.safeParse(env);
