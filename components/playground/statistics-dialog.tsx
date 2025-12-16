@@ -39,11 +39,11 @@ function TooltipContent({ name, value }: { name: string; value: string }) {
 const chartConfig = {
   memory: {
     label: 'Память',
-    color: '#4A90E2',
+    color: 'var(--chart-3)',
   },
   cpu: {
     label: 'Процессор',
-    color: '#F5A623',
+    color: 'var(--chart-1)',
   },
 } satisfies ChartConfig;
 

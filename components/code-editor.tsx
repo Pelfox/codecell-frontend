@@ -6,6 +6,7 @@ import { defaultSettingsGithubLight, githubLightStyle } from '@uiw/codemirror-th
 import createTheme from '@uiw/codemirror-themes';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import { useCallback } from 'react';
+import { cn } from '@/lib/utils';
 
 /**
  * The mapping for the supported languages/techologies and editor extensions.
@@ -38,12 +39,18 @@ const editorTheme = createTheme({
 });
 
 interface CodeEditorProps {
+  disabled: boolean;
   contents?: string;
   onContentsChange: (value: string) => void;
   language: keyof typeof languagesExtensions;
 }
 
-export function CodeEditor({ contents = '', onContentsChange, language }: CodeEditorProps) {
+export function CodeEditor({
+  disabled,
+  contents = '',
+  onContentsChange,
+  language,
+}: CodeEditorProps) {
   const editorExtensions = languagesExtensions[language];
 
   const onCodeChange = useCallback(
@@ -58,13 +65,15 @@ export function CodeEditor({ contents = '', onContentsChange, language }: CodeEd
       value={contents}
       onChange={onCodeChange}
       // editor core settings
-      editable={true}
-      autoFocus={true}
+      editable={!disabled}
+      autoFocus={!disabled}
       extensions={editorExtensions}
       basicSetup={editorSettings}
-      // visuals settings
+      // visual settings
       maxHeight="100%"
       theme={editorTheme}
+      aria-disabled={disabled}
+      className={cn(disabled && 'opacity-50 cursor-not-allowed pointer-events-none')}
     />
   );
 }

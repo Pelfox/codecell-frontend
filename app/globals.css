@@ -133,3 +133,27 @@ body {
 .cm-editor.cm-focused {
   @apply outline-none border-none shadow-none;
 }
+
+@keyframes indeterminate1 {
+  0% {
+    left: -35%;
+    right: 100%;
+  }
+  60%,
+  100% {
+    left: 100%;
+    right: -90%;
+  }
+}
+
+@keyframes indeterminate2 {
+  0% {
+    left: -200%;
+    right: 100%;
+  }
+  60%,
+  100% {
+    left: 107%;
+    right: -8%;
+  }
+}

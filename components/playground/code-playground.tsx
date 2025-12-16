@@ -125,7 +125,17 @@ export function CodePlayground() {
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         {/* Code editor */}
         <div className="flex-1 min-h-0 md:flex-none w-full md:w-[65%] lg:w-[75%] md:border-r border-border overflow-auto overscroll-none">
-          <CodeEditor onContentsChange={(value) => setCode(value)} language="dotnet" />
+          {isRunning && (
+            <div className="relative w-full h-1 bg-muted overflow-hidden rounded-full">
+              <div className="absolute inset-y-0 left-0 bg-sidebar-primary animate-[indeterminate1_2.1s_cubic-bezier(0.65,0.815,0.735,0.395)_infinite]" />
+              <div className="absolute inset-y-0 left-0 bg-sidebar-primary animate-[indeterminate2_2.1s_cubic-bezier(0.4,0,0.2,1)_infinite]" />
+            </div>
+          )}
+          <CodeEditor
+            disabled={isRunning}
+            onContentsChange={(value) => setCode(value)}
+            language="dotnet"
+          />
         </div>
 
         {/* Sidebar */}
