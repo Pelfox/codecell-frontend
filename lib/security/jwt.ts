@@ -6,16 +6,18 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { importPKCS8, importSPKI, jwtVerify, SignJWT } from 'jose';
 import { config } from '../config';
+import { env } from 'node:process';
 
-const jwtPrivateKey = importPKCS8(
-  readFileSync(path.resolve(config.JWT_PRIVATE_PATH), 'utf-8'),
-  'RS256',
-);
+let jwtPrivateKey: Promise<any>;
+let jwtPublicKey: Promise<any>;
 
-const jwtPublicKey = importSPKI(
-  readFileSync(path.resolve(config.JWT_PUBLIC_PATH), 'utf-8'),
-  'RS256',
-);
+if (env.CI !== 'true') {
+  jwtPrivateKey = importPKCS8(readFileSync(path.resolve(config.JWT_PRIVATE_PATH), 'utf8'), 'RS256');
+  jwtPublicKey = importSPKI(readFileSync(path.resolve(config.JWT_PUBLIC_PATH), 'utf8'), 'RS256');
+} else {
+  jwtPrivateKey = Promise.resolve(null);
+  jwtPublicKey = Promise.resolve(null);
+}
 
 /**
  * Creates a short-lived execution JWT.
