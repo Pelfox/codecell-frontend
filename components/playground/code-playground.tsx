@@ -19,7 +19,7 @@ import { StatisticsDialog } from './statistics-dialog';
 export function CodePlayground() {
   const [code, setCode] = useState('');
   const [stdin, setStdin] = useState('');
-  const [timeoutSeconds, setTimeoutSeconds] = useState(20);
+  const [timeoutSeconds, setTimeoutSeconds] = useState(60);
 
   const [isRunning, setIsRunning] = useState(false);
   const [outputLogs, setOutputLogs] = useState<Message[]>([]);
