@@ -39,8 +39,7 @@ RUN apk add --no-cache protobuf
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
-RUN --mount=type=cache,id=grpc-generated,target=/app/generated \
-    pnpm protocol:generate
+RUN pnpm protocol:generate
 
 RUN --mount=type=cache,id=next-cache,target=/app/.next/cache \
     pnpm build
