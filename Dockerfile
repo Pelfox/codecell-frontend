@@ -34,6 +34,8 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 ############################
 FROM pnpm AS build
 
+RUN apk add --no-cache protobuf
+
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
