@@ -1,11 +1,11 @@
 import antfu from '@antfu/eslint-config';
 
 export default antfu({
-  formatters: true,
   react: true,
   nextjs: true,
+  typescript: true,
+  formatters: true,
   stylistic: false,
-  ignores: ['./generated/', './components/ui/'],
   rules: {
     'no-console': 'off',
   },

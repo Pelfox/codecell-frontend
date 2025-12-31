@@ -1,10 +1,8 @@
-.next/
-.idea/
-.vscode/
-node_modules/
-generated/*.ts
-
+.git
+.github
+node_modules
+.next
 .env*
-README.md
-.gitignore
-next-env.d.ts
+.DS_Store
+.vscode
+.idea
