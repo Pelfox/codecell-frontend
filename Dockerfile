@@ -3,7 +3,7 @@
 ############################
 # Base
 ############################
-FROM node:24-alpine3.22 AS base
+FROM node:25.2.1-alpine3.23 AS base
 
 ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH \
