@@ -26,6 +26,8 @@ export function CodePlayground() {
   const [statisticsMessages, setStatisticsMessages] = useState<Message[]>([]);
 
   async function handleStartClick() {
+    window.umami?.track('run_clicked');
+
     // TODO: if `isRunning` is true, on second click cancel the operation
 
     const requestBody = {
@@ -46,6 +48,11 @@ export function CodePlayground() {
     function onConnectionOpen() {
       setOutputLogs([]);
       setIsRunning(true);
+      window.umami?.track('execution_started', {
+        timeoutSeconds,
+        language: 'dotnet',
+        hasStdin: stdin.length > 0,
+      });
     }
 
     // handler for each event from the server
@@ -68,6 +75,10 @@ export function CodePlayground() {
         if (!message.statistics) {
           setOutputLogs((prev) => [...prev, message]);
         } else if (message.statistics) {
+          // skip empty statistics messages
+          if (message.statistics.cpuPercent === 0 && message.statistics.memoryUsed === 0) {
+            return;
+          }
           setStatisticsMessages((prev) => [...prev, message]);
         }
 
@@ -88,6 +99,7 @@ export function CodePlayground() {
     // handler for connection close event
     function onConnectionClose() {
       setIsRunning(false);
+      window.umami?.track('execution_finished');
     }
 
     await createSSEClient(
@@ -156,7 +168,11 @@ export function CodePlayground() {
               <Slider
                 defaultValue={[20]}
                 value={[timeoutSeconds]}
-                onValueChange={(value) => setTimeoutSeconds(value[0])}
+                onValueChange={(value) => {
+                  const newTimeout = value[0];
+                  window.umami?.track('timeout_change', { oldTimeout: timeoutSeconds, newTimeout });
+                  setTimeoutSeconds(newTimeout);
+                }}
                 min={10}
                 step={1}
                 max={120}
